@@ -56,6 +56,14 @@
             socket.auth.serverOffset = serverOffset;
         });
 
+        // ON CONNECTION
+        socket.on('user connect', (data) => {
+            var item = document.createElement('li');
+            item.textContent = "User-" + data + " connected";
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
         const toggleButton = document.getElementById('toggle-btn');
 
         toggleButton.addEventListener('click', (e) => {

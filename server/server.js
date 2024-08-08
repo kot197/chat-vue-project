@@ -59,6 +59,7 @@ async function main() {
     }
   
     console.log(`connect ${socket.id}`);
+    io.emit('user connect', socket.id);
   
     socket.on('disconnect', (reason) => {
       console.log(`disconnect ${socket.id} due to ${reason}`);
