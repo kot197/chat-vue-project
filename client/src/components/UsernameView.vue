@@ -51,7 +51,6 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    transform: translateX(40px);
   }
 }
 </style>

@@ -1,11 +1,13 @@
 <!-- src/components/HomePage.vue -->
 <template>
-    <div id="title-wrapper">
-        <span class="app-title">ChatLynx</span>
-        <br>
-        <span class="subtitle">Your Links, Your Space</span>
-    </div>
-    <button class="button" @click="goToUsernamePage">Create New Room</button>
+    <div id="home">
+      <div id="title-wrapper">
+          <span class="app-title">ChatLynx</span>
+          <br>
+          <span class="subtitle">Your Links, Your Space</span>
+      </div>
+      <button class="button" @click="goToUsernamePage">Create New Room</button>
+  </div>
 </template>
   
 <script>
@@ -35,6 +37,12 @@ methods: {
     border-radius: 1rem;
     font-weight: bold;
     font-size: 1rem;
+    margin: 5rem;
+  }
+
+  #home {
+    display: flex;
+    align-items: center;
   }
 }
 </style>

@@ -29,7 +29,6 @@
     justify-content: space-around;
     width: 100%;
     height: 100%;
-    transform: translateX(-40px);
   }
 }
 </style>
