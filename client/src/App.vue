@@ -1,12 +1,15 @@
 <script setup>
 import { socket } from "@/socket";
 import { useMessageStore } from "@/stores/message"
+import { useConnectionStore } from "@/stores/connection";
 
 const messageStore = useMessageStore();
+const connectionStore = useConnectionStore(); 
 
 socket.off();
 
 messageStore.bindEvents();
+connectionStore.bindEvents();
 </script>
 
 

@@ -1,5 +1,7 @@
 <template>
-    <ul id="messages"></ul>
+    <ul id="messages">
+      <li v-for="message in messages" :key="message.id">{{ message }}</li>
+    </ul>
     <form id="form" @submit="submitMessage" action="">
       <input id="input" v-model="inputValue" autocomplete="off" /><button>Send</button>
       <button id="toggle-btn" @click="toggleConnection">{{ connectionToggleText }}</button>
@@ -8,6 +10,8 @@
 
 <script>
 import { socket, state } from "@/socket";
+import { useMessageStore } from "@/stores/message"
+import { mapState } from "pinia";
 
 export default {
   data() {
@@ -41,7 +45,8 @@ export default {
     connectionToggleText() {
       // `this` points to the component instance
       return state.connected ? 'Disconnect' : 'Connect'
-    }
+    },
+    ...mapState(useMessageStore, ['messages']),
   }
 };
 </script>
@@ -54,7 +59,7 @@ export default {
     #input:focus { outline: none; }
     #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 
-    #messages { list-style-type: none; margin: 0; padding: 0; }
+    #messages { list-style-type: none; margin: 0; padding: 0; width: 100%; }
     #messages > li { padding: 0.5rem 1rem; }
-    #messages > li:nth-child(odd) { background: #efefef; }
+    #messages > li:nth-child(odd) { background: #443f3f; }
 </style>

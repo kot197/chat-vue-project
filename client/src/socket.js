@@ -4,8 +4,6 @@ import { io } from "socket.io-client";
 export const state = reactive({
   counter: 0,
   connected: false,
-  fooEvents: [],
-  barEvents: []
 });
 
 // "undefined" means the URL will be computed from the `window.location` object
@@ -22,26 +20,10 @@ export const socket = io(URL, {
     retries: 3,
 });
 
-socket.on("connect", () => {
-  state.connected = true;
-  console.log("EVENT:CONNECT state.connected: " + state.connected);
-});
-
-socket.on("disconnect", () => {
-  state.connected = false;
-  console.log("EVENT:DISCONNECT state.connected: " + state.connected);
-});
-
-socket.on("foo", (...args) => {
-  state.fooEvents.push(args);
-});
-  
-  socket.on("bar", (...args) => {
-  state.barEvents.push(args);
-});
-
 // Check if connected
 if (socket.connected) {
   state.connected = true;
   console.log('Already connected');
+} else {
+  console.log('Not connected');
 }
