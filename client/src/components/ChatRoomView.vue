@@ -1,10 +1,50 @@
 <template>
     <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-      <button id="toggle-btn">Disconnect</button>
+    <form id="form" @submit="submitMessage" action="">
+      <input id="input" v-model="inputValue" autocomplete="off" /><button>Send</button>
+      <button id="toggle-btn" @click="toggleConnection">{{ connectionToggleText }}</button>
     </form>
 </template>
+
+<script>
+import { socket, state } from "@/socket";
+
+export default {
+  data() {
+    return {
+      inputValue: '',
+    };
+  },
+  methods: {
+    toggleConnection(event) {
+      event.preventDefault();
+      if (socket.connected) {
+        socket.disconnect();
+        console.log("state.connected: " + state.connected);
+      } else {
+        socket.connect();
+        console.log("state.connected: " + state.connected);
+      }
+    },
+    submitMessage(event) {
+      event.preventDefault();
+      if(this.inputValue) {
+        // compute a unique offset
+        const clientOffset = `${socket.id}-${state.counter++}`;
+        socket.emit('chat message', this.inputValue, clientOffset);
+        this.inputValue = '';
+      }
+    },
+  },
+  computed: {
+    // a computed getter
+    connectionToggleText() {
+      // `this` points to the component instance
+      return state.connected ? 'Disconnect' : 'Connect'
+    }
+  }
+};
+</script>
 
 <style scoped>
     body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }

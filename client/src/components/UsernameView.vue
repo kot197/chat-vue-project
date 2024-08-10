@@ -7,6 +7,8 @@
   </template>
   
   <script>
+  import { socket } from "@/socket";
+
   export default {
     data() {
       return {
@@ -19,6 +21,9 @@
         console.log('Username:', this.username);
       },
       goToChatRoom() {
+        // Connect the socket to io server
+        socket.connect();
+        console.log("FUNC:goToChatRoom socket.connected: " + socket.connected);
         this.$router.push('/chat-room');
       },
     },

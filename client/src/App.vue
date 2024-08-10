@@ -1,3 +1,15 @@
+<script setup>
+import { socket } from "@/socket";
+import { useMessageStore } from "@/stores/message"
+
+const messageStore = useMessageStore();
+
+socket.off();
+
+messageStore.bindEvents();
+</script>
+
+
 <template>
   <main>
     <router-view></router-view>

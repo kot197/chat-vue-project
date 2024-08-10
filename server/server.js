@@ -36,18 +36,24 @@ async function main() {
     );
   `);
 
-  const app = express();
-  const server = createServer(app);
-  const io = new Server(server, {
+  // const app = express();
+  // const server = createServer(app);
+  console.log("On port " + process.env.PORT);
+  const io = new Server(process.env.PORT, {
     connectionStateRecovery: {},
+    cors: {
+      origin: "http://localhost:5173"
+    },
     // set up the adapter on each worker thread
     adapter: createAdapter()
   });
 
+  /*
   app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
-  
+  */
+
   io.on('connection', async (socket) => {
     if (socket.recovered) {
       // recovery was successful: socket.id, socket.rooms and socket.data were restored
@@ -104,11 +110,13 @@ async function main() {
   });
   
   // each worker will listen on a distinct port
-  const port = process.env.PORT;
+  // const port = process.env.PORT;
 
+  /*
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);
   });
+  */
 }
 
 main();
