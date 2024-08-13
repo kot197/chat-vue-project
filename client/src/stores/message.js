@@ -6,6 +6,7 @@ export const useMessageStore = defineStore("message", {
     state: () => ({
         messages: [],
         roomCode: null,
+        username: null,
     }),
     actions: {
         bindEvents() {
@@ -24,5 +25,8 @@ export const useMessageStore = defineStore("message", {
                 router.push('/username-view')
             })
         },
+        setUsername(newName) {
+            this.username = newName;
+        }
     },
 });

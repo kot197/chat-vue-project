@@ -17,6 +17,11 @@
   import { mapState } from "pinia";
 
   export default {
+    setup() {
+      const messageStore = useMessageStore();
+
+      return { messageStore };
+    },
     data() {
       return {
         username: '',
@@ -30,6 +35,8 @@
       goToChatRoom() {
         console.log("FUNC:goToChatRoom socket.connected: " + socket.connected);
         console.log("FUNC:goToChatRoom state.connected: " + state.connected);
+        socket.emit('create user', this.username);
+        this.messageStore.username = this.username;
         this.$router.push('/chat-room');
       },
     },

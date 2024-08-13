@@ -6,7 +6,7 @@ const { open } = require('sqlite');
 const { availableParallelism } = require('node:os');
 const cluster = require('node:cluster');
 const { createAdapter, setupPrimary } = require('@socket.io/cluster-adapter');
-const { openDb, initDb, insertMessage, recoverMessages, insertRoom } = require('./db');
+const { openDb, initDb, insertMessage, recoverMessages, insertRoom, insertUser } = require('./db');
 const { v4: uuidv4 } = require('uuid');
 
 if (cluster.isPrimary) {
@@ -90,6 +90,17 @@ async function main() {
       callback();
     });
 
+    socket.on('create user', async (userName, callback) => {
+      try {
+        await insertUser(db, userName);
+      } catch(error) {
+        console.error('Error inserting room:', error);
+        return;
+      }
+      callback();
+    });
+
+    // FOR TESTING
     socket.on('dummy test', async (callback) => {
       console.log("socket.on testing...");
       callback();

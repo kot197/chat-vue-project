@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
+const { getCurrentTime } = require('./utils')
 
 async function openDb () {
     return open({
@@ -37,12 +38,17 @@ async function initDb(db) {
 }
 
 async function insertMessage(db, msg, clientOffset) {
-    return await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
+    return await db.run('INSERT INTO messages (content, client_offset, time) VALUES (?, ?, ?)', msg, clientOffset, getCurrentTime());
 }
 
 async function insertRoom(db, roomCode) {
     await db.run(`INSERT INTO rooms (room_code)
         VALUES (?)`, roomCode);
+}
+
+async function insertUser(db, userName) {
+    await db.run(`INSERT INTO users (user_name)
+        VALUES (?)`, userName);
 }
 
 async function recoverMessages(db, socket) {
@@ -60,4 +66,5 @@ module.exports = {
     insertMessage,
     recoverMessages,
     insertRoom,
+    insertUser,
 };
