@@ -14,13 +14,24 @@ async function initDb(db) {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             client_offset TEXT UNIQUE,
             content TEXT,
+            time TEXT,
             room_id INTEGER,
+            user_id INTEGER,
+
             FOREIGN KEY (room_id) REFERENCES rooms(room_id)
+                ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+                ON DELETE CASCADE
         );
         
         CREATE TABLE IF NOT EXISTS rooms (
             room_id INTEGER PRIMARY KEY AUTOINCREMENT,
             room_code TEXT NOT NULL CHECK (LENGTH(room_code) = 36)
+        );
+
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_name TEXT
         );
       `);
 }
