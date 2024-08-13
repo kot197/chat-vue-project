@@ -1,9 +1,11 @@
 import { defineStore } from "pinia";
 import { socket } from "@/socket";
+import router from '@/router'
 
 export const useMessageStore = defineStore("message", {
     state: () => ({
         messages: [],
+        roomCode: null,
     }),
     actions: {
         bindEvents() {
@@ -16,6 +18,10 @@ export const useMessageStore = defineStore("message", {
                 var notificationString = "User-" + data + " connected";
                 this.messages.push(notificationString);
                 window.scrollTo(0, document.body.scrollHeight);
+            }),
+            socket.on("room created", (roomCode) => {
+                this.roomCode = roomCode;
+                router.push('/username-view')
             })
         },
     },

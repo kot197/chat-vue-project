@@ -1,13 +1,20 @@
 <!-- src/components/UsernamePage.vue -->
 <template>
-    <div id="input-wrapper">
-      <input id="username" v-model="username" placeholder="Enter username" />
-      <button class="button" @click="goToChatRoom">Join Room</button>
+    <div id="username-page">
+      <span class="sm-title">Link Created! Copy The Link Below</span>
+      <br>
+      <span class="sm-title">http://localhost:5173/chat/{{ roomCode }}</span>
+      <div id="input-wrapper">
+        <input id="username" v-model="username" placeholder="Enter username" />
+        <button class="button" @click="goToChatRoom">Join Room</button>
+      </div>
     </div>
   </template>
   
   <script>
-  import { socket } from "@/socket";
+  import { socket, state } from "@/socket";
+  import { useMessageStore } from "@/stores/message"
+  import { mapState } from "pinia";
 
   export default {
     data() {
@@ -21,12 +28,14 @@
         console.log('Username:', this.username);
       },
       goToChatRoom() {
-        // Connect the socket to io server
-        socket.connect();
         console.log("FUNC:goToChatRoom socket.connected: " + socket.connected);
+        console.log("FUNC:goToChatRoom state.connected: " + state.connected);
         this.$router.push('/chat-room');
       },
     },
+    computed: {
+      ...mapState(useMessageStore, ['roomCode']),
+    }
   };
   </script>
 

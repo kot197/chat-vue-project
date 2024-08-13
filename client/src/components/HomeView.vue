@@ -11,10 +11,13 @@
 </template>
   
 <script>
+import { socket } from '@/socket';
+
 export default {
 methods: {
     goToUsernamePage() {
-    this.$router.push('/username-view');
+      console.log("FUNC goToUsernamePage: " + socket.connected);
+      socket.emit('create room');
     },
 },
 };

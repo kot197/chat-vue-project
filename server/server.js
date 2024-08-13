@@ -6,6 +6,8 @@ const { open } = require('sqlite');
 const { availableParallelism } = require('node:os');
 const cluster = require('node:cluster');
 const { createAdapter, setupPrimary } = require('@socket.io/cluster-adapter');
+const { openDb, initDb, insertMessage, recoverMessages, insertRoom } = require('./db');
+const { v4: uuidv4 } = require('uuid');
 
 if (cluster.isPrimary) {
   const numCPUs = availableParallelism();
@@ -21,25 +23,13 @@ if (cluster.isPrimary) {
 }
 
 async function main() {
-   // open the database file
-   const db = await open({
-    filename: 'chat.db',
-    driver: sqlite3.Database
-  });
+  const db = await openDb();
+   // create our 'messages' table (you can ignore the 'client_offset' column for now)
+  initDb(db);
 
-  // create our 'messages' table (you can ignore the 'client_offset' column for now)
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        client_offset TEXT UNIQUE,
-        content TEXT
-    );
-  `);
-
-  // const app = express();
-  // const server = createServer(app);
-  console.log("On port " + process.env.PORT);
-  const io = new Server(process.env.PORT, {
+  const app = express();
+  const server = createServer(app);
+  const io = new Server(server, {
     connectionStateRecovery: {},
     cors: {
       origin: "http://localhost:5173"
@@ -48,22 +38,7 @@ async function main() {
     adapter: createAdapter()
   });
 
-  /*
-  app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-  });
-  */
-
   io.on('connection', async (socket) => {
-    if (socket.recovered) {
-      // recovery was successful: socket.id, socket.rooms and socket.data were restored
-      console.log("recovered!");
-      console.log("socket.rooms:", socket.rooms);
-      console.log("socket.data:", socket.data);
-    } else {
-      // new or unrecoverable session
-    }
-  
     console.log(`connect ${socket.id}`);
     io.emit('user connect', socket.id);
   
@@ -73,10 +48,11 @@ async function main() {
   
     socket.on('chat message', async (msg, clientOffset, callback) => {
       let result;
+
       try {
         // store the message in the database
         console.log(msg + " " + clientOffset);
-        result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
+        result = await insertMessage(db, msg, clientOffset);
       } catch (e) {
         // TODO handle the failure
         if (e.errno === 19 /* SQLITE_CONSTRAINT */ ) {
@@ -87,6 +63,7 @@ async function main() {
         }
         return;
       }
+
       console.log("before emit chat message");
       // include the offset with the message
       io.emit('chat message', msg, result.lastID);
@@ -94,15 +71,34 @@ async function main() {
       callback();
     });
 
+    socket.on('create room', async (callback) => {
+      const roomCode = uuidv4();
+      console.log('Generated room code:', roomCode);
+
+      try {
+        console.log('Inserting room...');
+        await insertRoom(db, roomCode);
+        console.log('Room inserted');
+      } catch(error) {
+        console.error('Error inserting room:', error);
+        return;
+      }
+      socket.join(roomCode);
+      socket.emit('room created', roomCode);
+      console.log(`Room created: ${roomCode}`);
+      io.to(roomCode).emit('new user joined the room');
+      callback();
+    });
+
+    socket.on('dummy test', async (callback) => {
+      console.log("socket.on testing...");
+      callback();
+    });
+
     if (!socket.recovered) {
       // if the connection state recovery was not successful
       try {
-        await db.each('SELECT id, content FROM messages WHERE id > ?',
-          [socket.handshake.auth.serverOffset || 0],
-          (_err, row) => {
-            socket.emit('chat message', row.content, row.id);
-          }
-        )
+        recoverMessages(db, socket);
       } catch (e) {
         // something went wrong
       }
@@ -110,13 +106,11 @@ async function main() {
   });
   
   // each worker will listen on a distinct port
-  // const port = process.env.PORT;
+  const port = process.env.PORT;
 
-  /*
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);
   });
-  */
 }
 
 main();

@@ -11,12 +11,11 @@ console.log("process.env.NODE_ENV " + process.env.NODE_ENV);
 const URL = process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000";
 
 export const socket = io(URL, {
-    autoConnect: false,
     auth: {
         serverOffset: 0
     },
     // enable retries
-    ackTimeout: 10000,
+    ackTimeout: 2000,
     retries: 3,
 });
 
