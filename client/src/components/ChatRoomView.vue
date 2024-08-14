@@ -1,6 +1,6 @@
 <template>
     <ul id="messages">
-      <li v-for="message in messages" :key="message.id">{{ message['time'] }} {{ message['content'] }}</li>
+      <li v-for="message in messages" :key="message.id">{{ message['time'] }} {{ message['username'] }} {{ message['content'] }}</li>
     </ul>
     <form id="form" @submit="submitMessage" action="">
       <input id="input" v-model="inputValue" autocomplete="off" /><button>Send</button>
@@ -15,6 +15,11 @@ import { mapState } from "pinia";
 import { getCurrentTime } from "@/utils"
 
 export default {
+  setup() {
+    const messageStore = useMessageStore();
+
+    return { messageStore };
+  },
   data() {
     return {
       inputValue: '',
@@ -36,7 +41,7 @@ export default {
       if(this.inputValue) {
         // compute a unique offset
         const clientOffset = `${socket.id}-${state.counter++}`;
-        socket.emit('chat message', this.inputValue, clientOffset, getCurrentTime());
+        socket.emit('chat message', this.inputValue, clientOffset, getCurrentTime(), this.messageStore.user['userId'], this.messageStore.user['username']);
         this.inputValue = '';
       }
     },

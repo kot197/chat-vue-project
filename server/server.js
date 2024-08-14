@@ -46,13 +46,13 @@ async function main() {
       console.log(`disconnect ${socket.id} due to ${reason}`);
     });
   
-    socket.on('chat message', async (msg, clientOffset, msgTime, callback, userName) => {
+    socket.on('chat message', async (msg, clientOffset, msgTime, userId, username, callback) => {
       let result;
 
       try {
         // store the message in the database
         console.log(msg + " " + clientOffset);
-        result = await insertMessage(db, msg, clientOffset, msgTime);
+        result = await insertMessage(db, msg, clientOffset, msgTime, userId);
       } catch (e) {
         // TODO handle the failure
         if (e.errno === 19 /* SQLITE_CONSTRAINT */ ) {
@@ -66,7 +66,7 @@ async function main() {
 
       console.log("before emit chat message");
       // include the offset with the message
-      io.emit('chat message', msg, result.lastID, msgTime);
+      io.emit('chat message', msg, result.lastID, msgTime, username);
       // acknowledge the event
       callback();
     });
@@ -92,12 +92,13 @@ async function main() {
 
     socket.on('create user', async (userName, callback) => {
       try {
-        await insertUser(db, userName);
+        result = await insertUser(db, userName);
       } catch(error) {
         console.error('Error inserting room:', error);
         return;
       }
-      socket.emit('user created');
+      console.log(userName + " | " + result.lastID);
+      socket.emit('user created', userName, result.lastID);
       callback();
     });
 

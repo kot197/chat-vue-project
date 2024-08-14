@@ -6,14 +6,15 @@ export const useMessageStore = defineStore("message", {
     state: () => ({
         messages: [],
         roomCode: null,
-        username: null,
+        user: null,
     }),
     actions: {
         bindEvents() {
-            socket.on("chat message", (msg, serverOffset, msgTime) => {
+            socket.on("chat message", (msg, serverOffset, msgTime, username) => {
                 this.messages.push({
                     content: msg,
                     time: msgTime,
+                    username: username,
                 });
                 window.scrollTo(0, document.body.scrollHeight);
                 socket.auth.serverOffset = serverOffset;
@@ -27,8 +28,15 @@ export const useMessageStore = defineStore("message", {
             }),
             socket.on("room created", (roomCode) => {
                 this.roomCode = roomCode;
-                router.push('/username-view')
-            })
+                router.push('/username-view');
+            }),
+            socket.on("user created", (username, userId) => {
+                this.user = {
+                    username: username,
+                    usedId: userId,
+                };
+                router.push('/chat-room');
+            }) 
         },
         setUsername(newName) {
             this.username = newName;

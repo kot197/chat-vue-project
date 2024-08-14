@@ -36,8 +36,8 @@ async function initDb(db) {
       `);
 }
 
-async function insertMessage(db, msg, clientOffset, msgTime) {
-    return await db.run('INSERT INTO messages (content, client_offset, time) VALUES (?, ?, ?)', msg, clientOffset, msgTime);
+async function insertMessage(db, msg, clientOffset, msgTime, userId) {
+    return await db.run('INSERT INTO messages (content, client_offset, time, user_id) VALUES (?, ?, ?, ?)', msg, clientOffset, msgTime, userId);
 }
 
 async function insertRoom(db, roomCode) {
@@ -46,7 +46,7 @@ async function insertRoom(db, roomCode) {
 }
 
 async function insertUser(db, userName) {
-    await db.run(`INSERT INTO users (user_name)
+    return await db.run(`INSERT INTO users (user_name)
         VALUES (?)`, userName);
 }
 

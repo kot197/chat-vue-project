@@ -42,9 +42,7 @@
         console.log('Username:', values);
         console.log("FUNC:goToChatRoom socket.connected: " + socket.connected);
         console.log("FUNC:goToChatRoom state.connected: " + state.connected);
-        socket.emit('create user', this.username);
-        this.messageStore.username = this.username;
-        this.$router.push('/chat-room');
+        socket.emit('create user', values['username']);
       },
       validateUsername(value) {
         if(!value) {
