@@ -4,10 +4,13 @@
       <span class="sm-title">Link Created! Copy The Link Below</span>
       <br>
       <span class="sm-title">http://localhost:5173/chat/{{ roomCode }}</span>
-      <div id="input-wrapper">
-        <input id="username" v-model="username" placeholder="Enter username" />
-        <button class="button" @click="goToChatRoom">Join Room</button>
-      </div>
+      <Form class="form" @submit="onSubmit">
+        <div>
+          <Field id="username" name="username" placeholder="Enter username" :rules="validateUsername"/>
+        </div>
+        <ErrorMessage name="username" class="error-message"/>
+        <button class="button">Join Room</button>
+      </Form>
     </div>
   </template>
   
@@ -15,6 +18,7 @@
   import { socket, state } from "@/socket";
   import { useMessageStore } from "@/stores/message"
   import { mapState } from "pinia";
+  import { Form, Field, ErrorMessage } from 'vee-validate';
 
   export default {
     setup() {
@@ -27,10 +31,27 @@
         username: '',
       };
     },
+    components: {
+      Form,
+      Field,
+      ErrorMessage,
+    },
     methods: {
-      submitUsername() {
+      onSubmit(values) {
         // Handle username submission, e.g., save it or navigate to another page
-        console.log('Username:', this.username);
+        console.log('Username:', values);
+      },
+      validateUsername(value) {
+        if(!value) {
+          return 'Username is required to enter the room';
+        }
+
+        const maxLength = 50;
+        if(value.length > maxLength) {
+          return `Username is too long, please make it less than ${maxLength} characters`;
+        }
+
+        return true;
       },
       goToChatRoom() {
         console.log("FUNC:goToChatRoom socket.connected: " + socket.connected);
@@ -67,11 +88,18 @@
     margin: 2rem;
   }
 
-  #input-wrapper {
+  .form {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
+    position: relative;
+  }
+
+  .error-message {
+    position: absolute;
+    top: 6rem; /* Adjust this value as needed to position below the input */
+    left: 0;
   }
 }
 </style>

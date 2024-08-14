@@ -12,6 +12,7 @@
   "dependencies": {
     "pinia": "^2.2.1",
     "socket.io-client": "^4.7.5",
+    "vee-validate": "^4.13.2",
     "vue": "^3.4.29",
     "vue-router": "^4.4.3"
   },
