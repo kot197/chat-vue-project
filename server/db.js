@@ -1,6 +1,5 @@
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
-const { getCurrentTime } = require('./utils')
 
 async function openDb () {
     return open({
@@ -37,8 +36,8 @@ async function initDb(db) {
       `);
 }
 
-async function insertMessage(db, msg, clientOffset) {
-    return await db.run('INSERT INTO messages (content, client_offset, time) VALUES (?, ?, ?)', msg, clientOffset, getCurrentTime());
+async function insertMessage(db, msg, clientOffset, msgTime) {
+    return await db.run('INSERT INTO messages (content, client_offset, time) VALUES (?, ?, ?)', msg, clientOffset, msgTime);
 }
 
 async function insertRoom(db, roomCode) {
@@ -52,10 +51,11 @@ async function insertUser(db, userName) {
 }
 
 async function recoverMessages(db, socket) {
-    await db.each('SELECT id, content FROM messages WHERE id > ?',
+    await db.each('SELECT id, content, time FROM messages WHERE id > ?',
         [socket.handshake.auth.serverOffset || 0],
         (_err, row) => {
-          socket.emit('chat message', row.content, row.id);
+            console.log('values to be emitted: ' + row.content + " " + row.time);
+          socket.emit('chat message', row.content, row.id, row.time);
         }
     );
 }

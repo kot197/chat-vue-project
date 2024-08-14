@@ -10,14 +10,19 @@ export const useMessageStore = defineStore("message", {
     }),
     actions: {
         bindEvents() {
-            socket.on("chat message", (msg, serverOffset) => {
-                this.messages.push(msg);
+            socket.on("chat message", (msg, serverOffset, msgTime) => {
+                this.messages.push({
+                    content: msg,
+                    time: msgTime,
+                });
                 window.scrollTo(0, document.body.scrollHeight);
                 socket.auth.serverOffset = serverOffset;
             }),
             socket.on("user connect", (data) => {
                 var notificationString = "User-" + data + " connected";
-                this.messages.push(notificationString);
+                this.messages.push({
+                    content: notificationString
+                });
                 window.scrollTo(0, document.body.scrollHeight);
             }),
             socket.on("room created", (roomCode) => {

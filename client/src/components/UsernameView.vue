@@ -40,6 +40,11 @@
       onSubmit(values) {
         // Handle username submission, e.g., save it or navigate to another page
         console.log('Username:', values);
+        console.log("FUNC:goToChatRoom socket.connected: " + socket.connected);
+        console.log("FUNC:goToChatRoom state.connected: " + state.connected);
+        socket.emit('create user', this.username);
+        this.messageStore.username = this.username;
+        this.$router.push('/chat-room');
       },
       validateUsername(value) {
         if(!value) {
@@ -52,13 +57,6 @@
         }
 
         return true;
-      },
-      goToChatRoom() {
-        console.log("FUNC:goToChatRoom socket.connected: " + socket.connected);
-        console.log("FUNC:goToChatRoom state.connected: " + state.connected);
-        socket.emit('create user', this.username);
-        this.messageStore.username = this.username;
-        this.$router.push('/chat-room');
       },
     },
     computed: {
