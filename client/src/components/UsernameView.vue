@@ -3,7 +3,7 @@
     <div id="username-page">
       <span class="sm-title">Link Created! Copy The Link Below</span>
       <br>
-      <span class="sm-title">http://localhost:5173/chat/{{ roomCode }}</span>
+      <span class="sm-title">http://localhost:5173/chat/{{ this.messageStore.roomCode }}</span>
       <Form class="form" @submit="onSubmit">
         <div>
           <Field id="username" name="username" placeholder="Enter username" :rules="validateUsername"/>
@@ -17,7 +17,6 @@
   <script>
   import { socket, state } from "@/socket";
   import { useMessageStore } from "@/stores/message"
-  import { mapState } from "pinia";
   import { Form, Field, ErrorMessage } from 'vee-validate';
 
   export default {
@@ -57,9 +56,6 @@
         return true;
       },
     },
-    computed: {
-      ...mapState(useMessageStore, ['roomCode']),
-    }
   };
   </script>
 

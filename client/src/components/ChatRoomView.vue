@@ -1,6 +1,6 @@
 <template>
     <ul id="messages">
-      <li v-for="message in messages" :key="message.id">{{ message['time'] }} {{ message['username'] }} {{ message['content'] }}</li>
+      <li v-for="message in this.messageStore.messages" :key="message.id">{{ message['time'] }} {{ message['username'] }} {{ message['content'] }}</li>
     </ul>
     <form id="form" @submit="submitMessage" action="">
       <input id="input" v-model="inputValue" autocomplete="off" /><button>Send</button>
@@ -11,7 +11,6 @@
 <script>
 import { socket, state } from "@/socket";
 import { useMessageStore } from "@/stores/message"
-import { mapState } from "pinia";
 import { getCurrentTime } from "@/utils"
 
 export default {
@@ -53,7 +52,6 @@ export default {
       // `this` points to the component instance
       return state.connected ? 'Disconnect' : 'Connect'
     },
-    ...mapState(useMessageStore, ['messages']),
   }
 };
 </script>
