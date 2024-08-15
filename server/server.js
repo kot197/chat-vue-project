@@ -83,10 +83,14 @@ async function main() {
         console.error('Error inserting room:', error);
         return;
       }
-      socket.join(roomCode);
-      socket.emit('room created', roomCode);
+      callback();
+    });
+
+    socket.on('join room', async (roomCode, callback) => {
+      socket.join(roomCode)
+      socket.emit('room created', roomCode); // Sent to the user
       console.log(`Room created: ${roomCode}`);
-      io.to(roomCode).emit('new user joined the room');
+      io.to(roomCode).emit('new user joined the room'); // Sent to all users of different sockets
       callback();
     });
 
