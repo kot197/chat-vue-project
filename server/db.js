@@ -51,11 +51,14 @@ async function insertUser(db, userName) {
 }
 
 async function recoverMessages(db, socket) {
-    await db.each('SELECT id, content, time FROM messages WHERE id > ?',
+    await db.each(`SELECT messages.id, messages.content, messages.time, users.user_name
+                    FROM messages
+                    JOIN users ON messages.user_id = users.user_id
+                    WHERE messages.id > ?`,
         [socket.handshake.auth.serverOffset || 0],
         (_err, row) => {
             console.log('values to be emitted: ' + row.content + " " + row.time);
-          socket.emit('chat message', row.content, row.id, row.time);
+          socket.emit('chat message', row.content, row.id, row.time, row.user_name);
         }
     );
 }

@@ -51,7 +51,7 @@ async function main() {
 
       try {
         // store the message in the database
-        console.log(msg + " " + clientOffset);
+        console.log(msg + " " + clientOffset + " " + userId);
         result = await insertMessage(db, msg, clientOffset, msgTime, userId);
       } catch (e) {
         // TODO handle the failure

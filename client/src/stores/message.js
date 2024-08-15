@@ -33,7 +33,7 @@ export const useMessageStore = defineStore("message", {
             socket.on("user created", (username, userId) => {
                 this.user = {
                     username: username,
-                    usedId: userId,
+                    userId: userId,
                 };
                 router.push('/chat-room');
             }) 

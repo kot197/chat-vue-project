@@ -41,6 +41,7 @@ export default {
       if(this.inputValue) {
         // compute a unique offset
         const clientOffset = `${socket.id}-${state.counter++}`;
+        console.log("submitMessage: " + this.messageStore.user['userId'] + " " + this.messageStore.user['username']);
         socket.emit('chat message', this.inputValue, clientOffset, getCurrentTime(), this.messageStore.user['userId'], this.messageStore.user['username']);
         this.inputValue = '';
       }
