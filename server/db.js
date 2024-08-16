@@ -70,8 +70,10 @@ async function recoverMessages(socket) {
     );
 }
 
-async function checkRoomCode(roomCode, socket) {
+async function checkRoomCode(roomCode) {
+    console.log("roomCode " + roomCode);
 
+    return await db.get(`SELECT room_code FROM rooms WHERE room_code = ?`, [roomCode]);
 }
 
 module.exports = {
@@ -81,4 +83,5 @@ module.exports = {
     recoverMessages,
     insertRoom,
     insertUser,
+    checkRoomCode,
 };

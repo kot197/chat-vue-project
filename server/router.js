@@ -1,10 +1,16 @@
+const { checkRoomCode } = require('./db');
 const express = require('express');
 const router = express.Router();
 
-// Define a route to get all users
-router.get('/users', (req, res) => {
-    // Logic to fetch and return all users
-    res.send('Get all users');
+router.get('/room/:roomCode', async (req, res) => {
+    console.log("Params " + req.params['roomCode']);
+    const row = await checkRoomCode(req.params['roomCode']);
+    console.log("row: " + row);
+    if(row) {
+        res.send(row.room_code);
+    } else {
+        res.send(row);
+    }
 });
 
 // Export the router

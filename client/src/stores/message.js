@@ -35,7 +35,9 @@ export const useMessageStore = defineStore("message", {
                     username: username,
                     userId: userId,
                 };
-                router.push('/chat-room');
+                if(this.roomCode) {
+                    router.push('/chat-room/' + this.roomCode);
+                }
             }) 
         },
         setUsername(newName) {
