@@ -1,14 +1,21 @@
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 
-async function openDb () {
-    return open({
+
+let db;
+
+async function openDb() {
+    if(db) {
+        return;
+    }
+
+    db = await open({
         filename: 'chat.db',
         driver: sqlite3.Database
     });
 }
 
-async function initDb(db) {
+async function initDb() {
     await db.exec(`
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,21 +43,21 @@ async function initDb(db) {
       `);
 }
 
-async function insertMessage(db, msg, clientOffset, msgTime, userId) {
+async function insertMessage(msg, clientOffset, msgTime, userId) {
     return await db.run('INSERT INTO messages (content, client_offset, time, user_id) VALUES (?, ?, ?, ?)', msg, clientOffset, msgTime, userId);
 }
 
-async function insertRoom(db, roomCode) {
+async function insertRoom(roomCode) {
     await db.run(`INSERT INTO rooms (room_code)
         VALUES (?)`, roomCode);
 }
 
-async function insertUser(db, userName) {
+async function insertUser(userName) {
     return await db.run(`INSERT INTO users (user_name)
         VALUES (?)`, userName);
 }
 
-async function recoverMessages(db, socket) {
+async function recoverMessages(socket) {
     await db.each(`SELECT messages.id, messages.content, messages.time, users.user_name
                     FROM messages
                     JOIN users ON messages.user_id = users.user_id
@@ -61,6 +68,10 @@ async function recoverMessages(db, socket) {
           socket.emit('chat message', row.content, row.id, row.time, row.user_name);
         }
     );
+}
+
+async function checkRoomCode(roomCode, socket) {
+
 }
 
 module.exports = {

@@ -8,6 +8,7 @@ const cluster = require('node:cluster');
 const { createAdapter, setupPrimary } = require('@socket.io/cluster-adapter');
 const { openDb, initDb, insertMessage, recoverMessages, insertRoom, insertUser } = require('./db');
 const { v4: uuidv4 } = require('uuid');
+const router = require('./router');
 
 if (cluster.isPrimary) {
   const numCPUs = availableParallelism();
@@ -23,11 +24,24 @@ if (cluster.isPrimary) {
 }
 
 async function main() {
-  const db = await openDb();
-   // create our 'messages' table (you can ignore the 'client_offset' column for now)
-  initDb(db);
+  await openDb();
+  await initDb();
 
   const app = express();
+  // Middleware to set CORS headers
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow all origins
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allow specific HTTP methods
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
+
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204); // Respond with 204 No Content for OPTIONS requests
+    }
+
+    next();
+  });
+  app.use('/', router);
   const server = createServer(app);
   const io = new Server(server, {
     connectionStateRecovery: {},
@@ -52,7 +66,7 @@ async function main() {
       try {
         // store the message in the database
         console.log(msg + " " + clientOffset + " " + userId);
-        result = await insertMessage(db, msg, clientOffset, msgTime, userId);
+        result = await insertMessage(msg, clientOffset, msgTime, userId);
       } catch (e) {
         // TODO handle the failure
         if (e.errno === 19 /* SQLITE_CONSTRAINT */ ) {
@@ -77,26 +91,26 @@ async function main() {
 
       try {
         console.log('Inserting room...');
-        await insertRoom(db, roomCode);
+        await insertRoom(roomCode);
         console.log('Room inserted');
       } catch(error) {
         console.error('Error inserting room:', error);
         return;
       }
+      socket.emit('room created', roomCode); // Sent to the user
+      console.log(`Room created: ${roomCode}`);
       callback();
     });
 
     socket.on('join room', async (roomCode, callback) => {
       socket.join(roomCode)
-      socket.emit('room created', roomCode); // Sent to the user
-      console.log(`Room created: ${roomCode}`);
       io.to(roomCode).emit('new user joined the room'); // Sent to all users of different sockets
       callback();
     });
 
     socket.on('create user', async (userName, callback) => {
       try {
-        result = await insertUser(db, userName);
+        result = await insertUser(userName);
       } catch(error) {
         console.error('Error inserting room:', error);
         return;
@@ -115,7 +129,7 @@ async function main() {
     if (!socket.recovered) {
       // if the connection state recovery was not successful
       try {
-        recoverMessages(db, socket);
+        recoverMessages(socket);
       } catch (e) {
         // something went wrong
       }

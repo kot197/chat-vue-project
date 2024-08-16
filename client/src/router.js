@@ -11,7 +11,9 @@ const routes = [
     { path: '/chat-room', component: ChatRoomView },
     {
       path: '/:pathMatch(.*)*',
-      component: NotFound
+      component: NotFound,
+      beforeEnter(to, from) {
+      }
     }
   ]
   
