@@ -40,8 +40,15 @@ export const useMessageStore = defineStore("message", {
                 }
             }) 
         },
-        setUsername(newName) {
-            this.username = newName;
+        setUser(user) {
+            if (typeof user !== 'object') {
+                throw new Error('Argument must be object');
+            }
+
+            this.user = user;
+        },
+        setRoomCode(roomCode) {
+            this.roomCode = roomCode;
         }
     },
 });

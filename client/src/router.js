@@ -33,6 +33,12 @@ const routes = [
             query: to.query,
             hash: to.hash,
           }
+        } else if(!messageStore.user) {
+          messageStore.setRoomCode(roomCode);
+
+          return {
+            path: '/username-view',
+          }
         }
       }
     },
