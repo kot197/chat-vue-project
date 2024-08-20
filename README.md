@@ -12,6 +12,6 @@ Language/Tools:
 * Socket.io (Websocket)
 * Docker (Deployment)
 
-## Screenshots
+## Screenshots (Running in Docker Containers)
 
 ![image](https://github.com/user-attachments/assets/b8da2a5b-82a5-477d-a997-349376288290)
